@@ -32,7 +32,10 @@ classifiers = [
 ]
 dependencies = [
     "haystack-ai>=2.24.1",
-    "shopsavvy-sdk>=1.1.0",
+    # 1.4.0 is the first SDK release whose response models all parse the real
+    # Data API responses (price history and scheduling were broken before it).
+    # These components only call search_products() and get_current_offers().
+    "shopsavvy-sdk>=1.4.0,<2",
 ]
 
 [project.urls]
