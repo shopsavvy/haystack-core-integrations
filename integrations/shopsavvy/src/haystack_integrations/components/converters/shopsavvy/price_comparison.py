@@ -5,11 +5,9 @@
 import json
 from typing import Any, Optional
 
-from haystack import Document, component, logging
+from haystack import Document, component
 from haystack.utils import Secret
 from shopsavvy import ShopSavvyDataAPI, ShopSavvyConfig
-
-logger = logging.getLogger(__name__)
 
 
 @component
@@ -86,14 +84,12 @@ class ShopSavvyPriceComparison:
 
         effective_retailer = retailer if retailer is not None else self.retailer
 
-        try:
-            result = self._client.get_current_offers(  # type: ignore[union-attr]
-                identifier=identifier,
-                retailer=effective_retailer,
-            )
-        except Exception as error:
-            logger.exception("Failed to get ShopSavvy offers for '%s': %s", identifier, error)
-            return {"documents": []}
+        # API failures raise the SDK's ShopSavvyError subclasses rather than
+        # masquerading as "no offers".
+        result = self._client.get_current_offers(  # type: ignore[union-attr]
+            identifier=identifier,
+            retailer=effective_retailer,
+        )
 
         documents: list[Document] = []
         for product in result.data:

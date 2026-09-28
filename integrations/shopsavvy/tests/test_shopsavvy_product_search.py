@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from haystack import Document
 from haystack.utils import Secret
+from shopsavvy import AuthenticationError
 
 from haystack_integrations.components.converters.shopsavvy import ShopSavvyProductSearch
 
@@ -66,17 +67,18 @@ class TestShopSavvyProductSearch:
 
         mock_client.search_products.assert_called_once_with(query="sony headphones", limit=5)
 
-    def test_run_returns_empty_on_error(self):
+    def test_run_raises_on_api_error(self):
         search = ShopSavvyProductSearch(
             api_key=Secret.from_token("ss_test_key123"),
         )
 
         mock_client = MagicMock()
-        mock_client.search_products.side_effect = Exception("API error")
+        mock_client.search_products.side_effect = AuthenticationError("Authentication failed. Check your API key.")
         search._client = mock_client
 
-        result = search.run(query="test")
-        assert result["documents"] == []
+        # An auth/rate-limit/network failure must not look like "no results".
+        with pytest.raises(AuthenticationError):
+            search.run(query="test")
 
     def test_warm_up_initializes_client(self):
         search = ShopSavvyProductSearch(

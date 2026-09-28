@@ -5,11 +5,9 @@
 import json
 from typing import Any, Optional
 
-from haystack import Document, component, logging
+from haystack import Document, component
 from haystack.utils import Secret
 from shopsavvy import ShopSavvyDataAPI, ShopSavvyConfig
-
-logger = logging.getLogger(__name__)
 
 
 @component
@@ -77,11 +75,10 @@ class ShopSavvyProductSearch:
         if self._client is None:
             self.warm_up()
 
-        try:
-            result = self._client.search_products(query=query, limit=self.top_k)  # type: ignore[union-attr]
-        except Exception as error:
-            logger.exception("Failed to search ShopSavvy for query '%s': %s", query, error)
-            return {"documents": []}
+        # API failures (bad key, rate limit, network) raise the SDK's ShopSavvyError
+        # subclasses: returning an empty list would make them indistinguishable
+        # from "no products matched".
+        result = self._client.search_products(query=query, limit=self.top_k)  # type: ignore[union-attr]
 
         documents: list[Document] = []
         for product in result.data:

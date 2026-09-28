@@ -9,6 +9,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 from haystack import Document
 from haystack.utils import Secret
+from shopsavvy import AuthenticationError
 
 from haystack_integrations.components.converters.shopsavvy import ShopSavvyPriceComparison
 
@@ -130,17 +131,18 @@ class TestShopSavvyPriceComparison:
             retailer="walmart.com",
         )
 
-    def test_run_returns_empty_on_error(self):
+    def test_run_raises_on_api_error(self):
         compare = ShopSavvyPriceComparison(
             api_key=Secret.from_token("ss_test_key123"),
         )
 
         mock_client = MagicMock()
-        mock_client.get_current_offers.side_effect = Exception("API error")
+        mock_client.get_current_offers.side_effect = AuthenticationError("Authentication failed. Check your API key.")
         compare._client = mock_client
 
-        result = compare.run(identifier="test")
-        assert result["documents"] == []
+        # An auth/rate-limit/network failure must not look like "no results".
+        with pytest.raises(AuthenticationError):
+            compare.run(identifier="test")
 
     def test_warm_up_initializes_client(self):
         compare = ShopSavvyPriceComparison(
