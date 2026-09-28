@@ -32,13 +32,13 @@ classifiers = [
 ]
 dependencies = [
     "haystack-ai>=2.24.1",
-    "shopsavvy-sdk>=1.0.0",
+    "shopsavvy-sdk>=1.1.0",
 ]
 
 [project.urls]
+Homepage = "https://shopsavvy.com/integrations/haystack"
 Documentation = "https://shopsavvy.com/data/documentation"
-Issues = "https://github.com/deepset-ai/haystack-core-integrations/issues"
-Source = "https://github.com/deepset-ai/haystack-core-integrations/tree/main/integrations/shopsavvy"
+Source = "https://github.com/shopsavvy/haystack-core-integrations/tree/feat/shopsavvy-integration/integrations/shopsavvy"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/haystack_integrations"]
