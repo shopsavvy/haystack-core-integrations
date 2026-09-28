@@ -57,25 +57,30 @@ from haystack_integrations.components.converters.shopsavvy import (
 )
 
 pipeline = Pipeline()
-pipeline.add_component("search", ShopSavvyProductSearch())
+pipeline.add_component("search", ShopSavvyProductSearch(top_k=5))
 pipeline.add_component("compare", ShopSavvyPriceComparison())
 
-# Search then compare
-search_result = pipeline.run({"search": {"query": "iphone 15 pro"}})
+# Each component needs its own input: a keyword query for search, a product
+# identifier (barcode, ASIN, URL, model number) for compare.
+result = pipeline.run(
+    {
+        "search": {"query": "sony wh-1000xm5"},
+        "compare": {"identifier": "B09XS7JWHH"},
+    }
+)
+products = result["search"]["documents"]
+offers = result["compare"]["documents"]
 ```
 
 ## Development
 
 ```bash
-# Install with test dependencies
-pip install -e ".[dev]"
-
 # Run unit tests
-pytest -m "not integration" tests/
+hatch run test:unit
 
 # Run integration tests (needs SHOPSAVVY_API_KEY)
 export SHOPSAVVY_API_KEY=ss_live_your_key
-pytest -m "integration" tests/
+hatch run test:integration
 ```
 
 ## License
