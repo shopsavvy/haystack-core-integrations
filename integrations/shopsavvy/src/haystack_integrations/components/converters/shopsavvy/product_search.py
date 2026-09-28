@@ -3,11 +3,12 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-from typing import Any, Optional
+from typing import Any
 
 from haystack import Document, component
 from haystack.utils import Secret
-from shopsavvy import ShopSavvyDataAPI, ShopSavvyConfig
+
+from shopsavvy import ShopSavvyConfig, ShopSavvyDataAPI
 
 
 @component
@@ -52,7 +53,7 @@ class ShopSavvyProductSearch:
         """
         self.api_key = api_key
         self.top_k = top_k
-        self._client: Optional[ShopSavvyDataAPI] = None
+        self._client: ShopSavvyDataAPI | None = None
 
     def warm_up(self) -> None:
         """Initialize the ShopSavvy API client."""

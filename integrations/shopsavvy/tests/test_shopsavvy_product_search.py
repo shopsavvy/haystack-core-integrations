@@ -86,9 +86,7 @@ class TestShopSavvyProductSearch:
         )
         assert search._client is None
 
-        with patch(
-            "haystack_integrations.components.converters.shopsavvy.product_search.ShopSavvyDataAPI"
-        ) as mock_cls:
+        with patch("haystack_integrations.components.converters.shopsavvy.product_search.ShopSavvyDataAPI") as mock_cls:
             search.warm_up()
             assert search._client is mock_cls.return_value
 

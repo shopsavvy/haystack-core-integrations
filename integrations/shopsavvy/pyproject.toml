@@ -79,6 +79,11 @@ non_interactive = true
 check_untyped_defs = true
 disallow_incomplete_defs = true
 
+[[tool.mypy.overrides]]
+# shopsavvy-sdk ships no py.typed marker
+module = ["shopsavvy.*"]
+ignore_missing_imports = true
+
 [tool.ruff]
 line-length = 120
 

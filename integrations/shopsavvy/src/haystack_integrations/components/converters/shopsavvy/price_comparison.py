@@ -3,18 +3,18 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import json
-from typing import Any, Optional
+from typing import Any
 
 from haystack import Document, component
 from haystack.utils import Secret
-from shopsavvy import ShopSavvyDataAPI, ShopSavvyConfig
+
+from shopsavvy import ShopSavvyConfig, ShopSavvyDataAPI
 
 
 @component
 class ShopSavvyPriceComparison:
     """
-    A component that retrieves current prices for a product across retailers
-    using the ShopSavvy Data API.
+    Retrieves current prices for a product across retailers from the ShopSavvy Data API.
 
     Given a product identifier (barcode, ASIN, URL, model number, or name),
     returns one Document per retailer offer with pricing details.
@@ -39,7 +39,7 @@ class ShopSavvyPriceComparison:
     def __init__(
         self,
         api_key: Secret = Secret.from_env_var("SHOPSAVVY_API_KEY"),
-        retailer: Optional[str] = None,
+        retailer: str | None = None,
     ) -> None:
         """
         Initialize the ShopSavvyPriceComparison component.
@@ -52,7 +52,7 @@ class ShopSavvyPriceComparison:
         """
         self.api_key = api_key
         self.retailer = retailer
-        self._client: Optional[ShopSavvyDataAPI] = None
+        self._client: ShopSavvyDataAPI | None = None
 
     def warm_up(self) -> None:
         """Initialize the ShopSavvy API client."""
@@ -64,7 +64,7 @@ class ShopSavvyPriceComparison:
     def run(
         self,
         identifier: str,
-        retailer: Optional[str] = None,
+        retailer: str | None = None,
     ) -> dict[str, Any]:
         """
         Get current prices for a product across retailers.
